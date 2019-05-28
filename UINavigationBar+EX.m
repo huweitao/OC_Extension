@@ -77,23 +77,6 @@
     }
 }
 
-- (void)recoveriOS10NavigationBarEffectView
-{
-    for (UIView *view in self.subviews) {
-        // >= ios 10
-        if ([view isKindOfClass:NSClassFromString(@"_UIBarBackground")]) {
-            for (UIView *subview in [view subviews]) {
-                [self setupNavigationBottomLine:subview toHide:YES];
-                if ([subview isKindOfClass:NSClassFromString(@"UIVisualEffectView")]){
-                    subview.hidden = NO;
-                    break;
-                }
-            }
-            break;
-        }
-    }
-}
-
 - (void)setupMaskLayerBeforeiOS10
 {
     if (@available(iOS 10.0, *)) {
@@ -115,12 +98,17 @@
         if (@available(iOS 10.0, *)) {
             if ([view isKindOfClass:NSClassFromString(@"_UIBarBackground")]) {
                 for (UIView *subview in [view subviews]) {
-                    [self setupNavigationBottomLine:subview toHide:YES];
+                    [self setupNavigationBottomLine:subview toHide:NO];
                     if ([subview isKindOfClass:NSClassFromString(@"UIVisualEffectView")]){
                         subview.hidden = NO;
                     }
-                    [self setupNavigationBottomLine:subview toHide:NO];
                 }
+                break;
+            }
+        }
+        else {
+            if ([view isKindOfClass:NSClassFromString(@"_UINavigationBarBackground")]) {
+                [self setupNavigationBottomLine:view toHide:NO];
                 break;
             }
         }
