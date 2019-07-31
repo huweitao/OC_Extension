@@ -12,7 +12,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface UIViewController (EX)
 
-- (UIViewController *)topViewController;
++ (void)simpleSystemAlertTitle:(NSString *)title message:(NSString *)msg lastTime:(CGFloat)time;
++ (UIViewController *)currentTopViewController;
++ (void)pushToViewController:(UIViewController *)vc;
++ (void)presentViewControllerOnTop:(UIViewController *)vc;
 
 @end
 
