@@ -38,14 +38,42 @@
         [invocation setArgument:&obj atIndex:i+2];
     }
     [invocation invoke];
+    [invocation retainArguments];
     
-    //返回值处理
-    id callBackObject = nil;
-    if(signature.methodReturnLength)
-    {
-        [invocation getReturnValue:&callBackObject];
+    // return instance
+    // https://blog.csdn.net/ZBrightz/article/details/46514565
+    const char * returnType = methodSignature.methodReturnType;
+    NSString *returnTypeStr = [NSString stringWithUTF8String:returnType];
+    if ([returnTypeStr containsString:@"\""]) {
+        returnType = [returnTypeStr substringToIndex:1].UTF8String;
     }
-    return callBackObject;
+    
+    NSLog(@"Return type ==> %s",returnType);
+    id returnValue = nil;
+    if (strcmp(returnType,@encode(void)) == 0) {
+        returnValue = nil;
+    }
+    else if (strcmp(returnType, @encode(id)) == 0) {
+        [invocation getReturnValue:&returnValue];
+    }
+    else {
+        //根据长度申请内存
+        NSUInteger length = signature.methodReturnLength;
+        void *buffer = (void *)malloc(length);
+        // 为变量赋值
+        [invocation getReturnValue:buffer];
+        if(strcmp(returnType, @encode(BOOL)) == 0) {
+            returnValue = [NSNumber numberWithBool:*((BOOL*)buffer)];
+        }
+        else if(strcmp(returnType, @encode(NSInteger)) == 0) {
+            returnValue = [NSNumber numberWithInteger:*((NSInteger*)buffer)];
+        }
+        else {
+            returnValue = [NSValue valueWithBytes:buffer objCType:returnType];
+        }
+        free(buffer);
+    }
+    return returnValue;
 }
 
 @end
