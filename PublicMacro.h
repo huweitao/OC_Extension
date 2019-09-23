@@ -98,13 +98,34 @@ static inline id _Nonnull PerformeSelector_MutiplyParams_ReturnInstance(id _Null
     }
 }
 
+static inline id _Nonnull ObjectPerformeSelector_NoReturn(id _Nullable obj, NSString * _Nonnull methodName, id _Nullable object)
+{
+    SEL methodSEL = NSSelectorFromString(methodName);
+    if ([obj respondsToSelector:methodSEL]) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+        if (!object) {
+            [obj performSelector:methodSEL];
+        }
+        else {
+            [obj performSelector:methodSEL withObject:object];
+        }
+#pragma clang diagnostic pop
+    }
+}
+
 static inline id _Nonnull ObjectPerformeSelector_ReturnInstance(id _Nullable obj, NSString * _Nonnull methodName, id _Nullable object)
 {
     SEL methodSEL = NSSelectorFromString(methodName);
     if ([obj respondsToSelector:methodSEL]) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Warc-performSelector-leaks"
-        return [obj performSelector:methodSEL withObject:object];
+        if (!object) {
+            return [obj performSelector:methodSEL];
+        }
+        else {
+            return [obj performSelector:methodSEL withObject:object];
+        }
 #pragma clang diagnostic pop
     }
     return nil;
@@ -117,7 +138,12 @@ static inline id _Nonnull ClassPerformeSelector_ReturnInstance(NSString * _Nonnu
     if (classInstance && [classInstance respondsToSelector:methodSEL]) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Warc-performSelector-leaks"
-        return [classInstance performSelector:methodSEL withObject:object];
+        if (!object) {
+            return [classInstance performSelector:methodSEL];
+        }
+        else {
+            return [classInstance performSelector:methodSEL withObject:object];
+        }
 #pragma clang diagnostic pop
     }
     return nil;
@@ -130,7 +156,12 @@ static inline void ClassPerformeSelector_NoReturn(NSString * _Nonnull clazz, NSS
     if (classInstance && [classInstance respondsToSelector:methodSEL]) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Warc-performSelector-leaks"
-        [classInstance performSelector:methodSEL withObject:object];
+        if (!object) {
+            [classInstance performSelector:methodSEL];
+        }
+        else {
+            [classInstance performSelector:methodSEL withObject:object];
+        }
 #pragma clang diagnostic pop
     }
 }
@@ -166,5 +197,41 @@ static inline bool Inline_SwizzleMethod(Class _Nonnull origClass, SEL _Nonnull o
     return true;
 }
 
+static inline bool In_SwizzleClassMethod(Class _Nonnull origClass, SEL _Nonnull origSel, Class _Nonnull newClass, SEL _Nonnull newSel)
+{
+    Method origMethod = class_getClassMethod(origClass, origSel);
+    if (!origMethod) {
+        NSLog(@"Original method %@ not found for class %@", NSStringFromSelector(origSel), [origClass class]);
+        return false;
+    }
+    
+    Method newMethod = class_getClassMethod(newClass, newSel);
+    if (!newMethod) {
+        NSLog( @"New method %@ not found for class %@", NSStringFromSelector(newSel), [newClass class]);
+        return false;
+    }
+    
+    //    if ([origClass respondsToSelector:origSel]) {
+    //       NSLog(@"Original method %@ is can be responeded by class %@",NSStringFromSelector(origSel), [origClass class]);
+    //    }
+    //    else {
+    //        NSLog(@"Original method %@ is not owned by class %@",NSStringFromSelector(origSel), [origClass class]);
+    //    }
+    
+    if (class_addMethod(origClass,origSel,class_getMethodImplementation(origClass, origSel),method_getTypeEncoding(origMethod))) {
+        NSLog(@"Original method %@ is not owned by class %@",NSStringFromSelector(origSel), [origClass class]);
+        //        class_replaceMethod(origClass, newSel, class_getMethodImplementation(origClass, origSel), method_getTypeEncoding(origMethod));
+        return false;
+    }
+    
+    // 添加新方法以及实现到需要被swizzle的class里
+    if (!class_addMethod(origClass,newSel,class_getMethodImplementation(newClass, newSel),method_getTypeEncoding(newMethod))) {
+        NSLog(@"New method %@ can not be added in class %@",NSStringFromSelector(newSel), [newClass class]);
+        return false;
+    }
+    
+    method_exchangeImplementations(class_getClassMethod(origClass, origSel), class_getClassMethod(origClass, newSel));
+    return true;
+}
 
 #endif /* PublicMacro_h */
