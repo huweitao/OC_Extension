@@ -56,7 +56,35 @@ static inline id _Nonnull PerformeSelector_MutiplyParams_ReturnInstance(id _Null
         NSInteger resultParamCount = MIN(signatureParamCount, requireParamCount);
         for (NSInteger i = 0; i < resultParamCount; i++) {
             id  obj = params[i];
-            [invocation setArgument:&obj atIndex:i+2];
+            // Null
+            if ([obj isKindOfClass:[NSNull class]]) {
+                obj = nil;
+            }
+            // bool / int / float /double
+            if([obj isKindOfClass:[NSNumber class]])
+            {
+                void *p;
+                NSNumber *num = (NSNumber *)obj;
+                if(strcmp([num objCType], @encode(float)) == 0) {
+                    float v = [num floatValue];
+                    p = &v;
+                }
+                else if(strcmp([num objCType], @encode(double)) == 0) {
+                    double v = [num doubleValue];
+                    p = &v;
+                }
+                else {
+                    long v = [num longValue];
+                    p = &v;
+                }
+                
+                [invocation setArgument:p atIndex:i+2];
+            }
+            else {
+                // object
+                [invocation setArgument:&obj atIndex:i+2];
+            }
+            
         }
         [invocation invoke];
         [invocation retainArguments];
@@ -78,10 +106,10 @@ static inline id _Nonnull PerformeSelector_MutiplyParams_ReturnInstance(id _Null
             [invocation getReturnValue:&returnValue];
         }
         else {
-            //根据长度申请内存
+            // malloc based on length
             NSUInteger length = methodSignature.methodReturnLength;
             void *buffer = (void *)malloc(length);
-            //为变量赋值
+            // assign
             [invocation getReturnValue:buffer];
             if(strcmp(returnType, @encode(BOOL)) == 0) {
                 returnValue = [NSNumber numberWithBool:*((BOOL*)buffer)];
