@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (void)simpleSystemAlertTitle:(NSString *)title message:(NSString *)msg lastTime:(CGFloat)time;
 + (void)simpleSystemAlertTitle:(NSString *)title message:(NSString *)msg okTitle:(NSString *)okTitle cancel:(NSString *)cancelTitle okHandler:(void (^)(void))okHandler cancelHandler:(void (^)(void))cancelHandler;
++ (void)simpleTextFieldTitle:(NSString *)title message:(NSString *)msg okHandler:(void (^ __nullable)(NSString *))okHandler;
 + (UIViewController *)currentTopViewController;
 + (void)pushToViewController:(UIViewController *)vc;
 + (void)presentViewControllerOnTop:(UIViewController *)vc;

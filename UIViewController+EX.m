@@ -92,7 +92,36 @@ static inline void SafeAsyncMain(dispatch_block_t block)
         
         [[UIViewController currentTopViewController] presentViewController:alertController animated:YES completion:nil];
     });
-    
+}
+
++ (void)simpleTextFieldTitle:(NSString *)title message:(NSString *)msg okHandler:(void (^ __nullable)(NSString *inputString))okHandler
+{
+    SafeAsyncMain(^{
+        UIAlertController *alert = [UIAlertController
+                                    alertControllerWithTitle:title
+                                    message:msg
+                                    preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"确认" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            UITextField *field = [alert.textFields firstObject];
+            NSLog(@"%@",field.text);
+            if (okHandler && field) {
+                okHandler(field.text);
+            }
+            [alert dismissViewControllerAnimated:YES completion:nil];
+        }];
+        [alert addAction:okAction];
+        
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+            [alert dismissViewControllerAnimated:YES completion:nil];
+        }];
+        [alert addAction:cancelAction];
+        
+        [alert addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
+            //
+        }];
+        
+        [[UIViewController currentTopViewController] presentViewController:alert animated:YES completion:nil];
+    });
 }
 
 + (void)pushToViewController:(UIViewController *)vc
