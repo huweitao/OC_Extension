@@ -1,6 +1,6 @@
 //
 //  NSString+LoginExtension.h
-//  AccountAuthService
+//  
 //
 //  Created by huweitao on 2019/4/2.
 //  Copyright © 2019年 DMC. All rights reserved.

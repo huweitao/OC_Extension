@@ -1,6 +1,6 @@
 //
 //  NSObject+MultiPerformSEL.h
-//  AccountAuthService
+//  
 //
 //  Created by huweitao on 2019/4/8.
 //  Copyright © 2019年 DMC. All rights reserved.

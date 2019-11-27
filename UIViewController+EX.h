@@ -1,6 +1,5 @@
 //
 //  UIViewController+EX.h
-//  AccountAuthService
 //
 //  Created by huweitao on 2019/4/17.
 //  Copyright © 2019年 DMC. All rights reserved.
@@ -18,6 +17,9 @@ NS_ASSUME_NONNULL_BEGIN
 + (UIViewController *)currentTopViewController;
 + (void)pushToViewController:(UIViewController *)vc;
 + (void)presentViewControllerOnTop:(UIViewController *)vc;
++ (void)presentViewControllerOnTop:(UIViewController *)vc;
++ (void)presentViewControllerOnTop:(UIViewController *)vc completion:(void (^ __nullable)(void))completion;
++ (void)printTopViewControllerSubViews;
 
 @end
 

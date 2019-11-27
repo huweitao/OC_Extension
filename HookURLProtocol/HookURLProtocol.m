@@ -1,9 +1,9 @@
 //
 //  HookURLProtocol.m
-//  AccountAuthService
+//
 //
 //  Created by huweitao on 2019/4/9.
-//  Copyright © 2019年 Alipay. All rights reserved.
+//  Copyright © 2019年 . All rights reserved.
 //
 
 #import "HookURLProtocol.h"

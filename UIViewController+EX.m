@@ -1,13 +1,11 @@
 //
 //  UIViewController+EX.m
-//  AccountAuthService
 //
 //  Created by huweitao on 2019/4/17.
 //  Copyright © 2019年 DMC. All rights reserved.
 //
 
 #import "UIViewController+EX.h"
-#import "MODebugMacro.h"
 
 static inline void SafeAsyncMain(dispatch_block_t block)
 {
@@ -142,6 +140,57 @@ static inline void SafeAsyncMain(dispatch_block_t block)
     SafeAsyncMain(^{
         [[UIViewController currentTopViewController] presentViewController:vc animated:YES completion:nil];
     });
+}
+
++ (void)presentViewControllerOnTop:(UIViewController *)vc
+{
+    [self presentViewControllerOnTop:vc completion:nil];
+}
+
++ (void)presentViewControllerOnTop:(UIViewController *)vc completion:(void (^ __nullable)(void))completion
+{
+    if (!vc) {
+        return;
+    }
+    SafeAsyncMain(^{
+        [[UIViewController currentTopViewController] presentViewController:vc animated:YES completion:completion];
+    });
+}
+
++ (void)printTopViewControllerSubViews
+{
+    SafeAsyncMain(^{
+        UIViewController *topVC = [UIViewController currentTopViewController];
+        if (topVC && topVC.view) {
+            [UIViewController printSubviews:topVC.view level:0];
+        }
+    });
+    
+}
+
+#pragma mark - Private
+
++ (void)printSubviews:(UIView *)view level:(int)level
+{
+    if (!view) {
+        return;
+    }
+    NSArray *subviews = [view subviews];
+    // no subview will
+    if ([subviews count] == 0) {
+        return;
+    }
+    for (UIView *subview in subviews) {
+        // padding for print format
+        NSString *blank = @"";
+        for (int i = 1; i < level; i++) {
+            blank = [NSString stringWithFormat:@"  %@", blank];
+        }
+        // Print
+        NSLog(@"%@%d: %@", blank, level, subview.class);
+        // recursively find subview
+        [self printSubviews:subview level:(level+1)];
+    }
 }
 
 @end

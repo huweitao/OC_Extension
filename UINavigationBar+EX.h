@@ -1,6 +1,5 @@
 //
 //  UINavigationBar+EX.h
-//  AccountAuthService
 //
 //  Created by huweitao on 2019/5/22.
 //  Copyright © 2019年 DMC. All rights reserved.

@@ -1,9 +1,8 @@
 //
 //  PublicMacro.h
-//  AlipayMoDebugBox
 //
 //  Created by huweitao on 2019/8/9.
-//  Copyright © 2019 Alipay. All rights reserved.
+//  Copyright © 2019. All rights reserved.
 //
 
 #ifndef PublicMacro_h
